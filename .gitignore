@@ -1,5 +1,4 @@
 .idea
-*.wav
 venv
+.venv
 *.pyc
-vosk-server/model/extracted

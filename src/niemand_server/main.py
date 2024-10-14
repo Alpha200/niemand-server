@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 from contextlib import asynccontextmanager
 from typing import Optional, Annotated
 
@@ -43,6 +44,7 @@ logging.basicConfig(
 )
 logging.getLogger("apscheduler").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
+time.tzset()
 
 container = Container()
 container.config.calendar.url.from_env("CALENDAR_CALDAV_URL")
