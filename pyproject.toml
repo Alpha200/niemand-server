@@ -17,7 +17,8 @@ dependencies = [
     "dependency-injector~=4.42.0",
     "setuptools~=75.1.0",
     "python-dateutil~=2.9.0",
-    "apscheduler~=3.10.4"
+    "apscheduler~=3.10.4",
+    "humanize~=4.11.0",
 ]
 
 [build-system]

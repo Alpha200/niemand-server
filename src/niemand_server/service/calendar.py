@@ -5,6 +5,9 @@ from typing import List, Optional, Union, Tuple
 import caldav
 from icalendar import Calendar, Event
 
+from niemand_server.util import format_date
+
+
 @dataclass
 class CalendarEntry:
     summary: str
@@ -13,11 +16,15 @@ class CalendarEntry:
 
     def format(self) -> str:
         if isinstance(self.begin, datetime):
-            start_text = f"Am {self.begin.astimezone().strftime('%a %d.%m.%Y %H:%M:%S')}"
-            end_text = f"Bis {self.end.astimezone().strftime('%a %d.%m.%Y %H:%M:%S')}" if self.end is not None else ""
+            start_text = f"Am {format_date(self.begin)}"
+            end_text = f"Bis {format_date(self.end)}" if self.end is not None else ""
         else:
-            start_text = f"Am {self.begin.strftime('%a %d.%m.%Y')}"
-            end_text = ""
+            if self.begin == self.end:
+                start_text = f"Am {format_date(self.begin)} ganztägig"
+                end_text = ""
+            else:
+                start_text = f"Vom {format_date(self.begin)}"
+                end_text = f"Bis {format_date(self.end)}"
 
         return f"Titel {self.summary} {start_text} {end_text}"
 
@@ -30,22 +37,15 @@ class TodoEntry:
     geo: Tuple[float, float]
 
     def format(self) -> str:
-        #if isinstance(self.begin, datetime):
-        #    begin_text = f"Relevant ab {self.begin.astimezone().strftime('%a %d.%m.%Y %H:%M:%S')}"
-        #else:
-        #    begin_text = f"Relevant ab {self.begin.strftime('%a %d.%m.%Y')}" if self.begin is not None else ""
-
         due_text = ""
 
         if self.due is not None:
-            due = self.due.astimezone() if isinstance(self.due, datetime) else datetime.combine(self.due, datetime.min.time()).astimezone()
+            due_comp = self.due.astimezone() if isinstance(self.due, datetime) else datetime.combine(self.due, datetime.min.time()).astimezone()
 
-            if due < datetime.now().astimezone():
+            if due_comp < datetime.now().astimezone():
                 due_text = "überfällig"
-            elif isinstance(self.due, datetime):
-                due_text = f"Fällig am {self.due.astimezone().strftime('%a %d.%m.%Y %H:%M:%S')}"
             else:
-                due_text = f"Fällig am {self.due.strftime('%a %d.%m.%Y')}" if self.due is not None else ""
+                due_text = f"Fällig {format_date(self.due)}"
 
         return f"{self.summary} {due_text}"
 
