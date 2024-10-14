@@ -125,15 +125,15 @@ class AiReportService:
             if todo_is_relevant(todo)
         ]
 
-        result = ""
+        results = []
 
         if len(entries) > 0:
-            result += "Calendar: " + reduce(lambda a, b: f"{a} - {b}", (event.format() for event in entries))
+            results.append("Calendar: " + reduce(lambda a, b: f"{a} - {b}", (event.format() for event in entries)))
 
         if len(todos) > 0:
-            result += "Todo: " + reduce(lambda a, b: f"{a} - {b}", (todo.format() for todo in todos))
+            results.append("Todo: " + reduce(lambda a, b: f"{a} - {b}", (todo.format() for todo in todos)))
 
-        return result
+        return " | ".join(results)
 
     def get_weather_data(self) -> str:
         if self.context_data.weather is None:
