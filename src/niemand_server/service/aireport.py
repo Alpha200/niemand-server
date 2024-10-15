@@ -48,6 +48,7 @@ class AiReportService:
             traccar_device_id: str,
             calendar_names: str,
             default_place: str,
+            user_name: str,
             location_service: LocationService,
             calendar_service: CalendarService,
             weather_service: WeatherService,
@@ -58,6 +59,7 @@ class AiReportService:
         self.traccar_device_id = traccar_device_id
         self.default_place = default_place
         self.calendar_names = calendar_names.split(',')
+        self.user_name = user_name
         self.location_service = location_service
         self.calendar_service = calendar_service
         self.weather_service = weather_service
@@ -74,24 +76,28 @@ class AiReportService:
         )
 
     async def update_context(self):
-        self.logger.info(f"Updating user context")
+        self.logger.info(f"Start updating user context")
         self.context_data.location = await self.location_service.get_device_location(self.traccar_device_id)
 
+        self.logger.info(f"Updating calendar context")
         entries, todos = self.calendar_service.get_upcoming_events_and_todos(self.calendar_names, 7)
         self.context_data.calender = Calendar(entries=entries, todos=todos)
 
         if self.context_data.weather is None or self.context_data.weather.last_updated < datetime.now() - timedelta(minutes=15):
+            self.logger.info("Updating weather context")
             self.context_data.weather = Weather(
                 forecast=await self.weather_service.get_forecast(self.default_place),
                 last_updated=datetime.now(),
             )
 
         if self.context_data.train_status is None or self.context_data.train_status.last_updated < datetime.now() - timedelta(minutes=5):
+            self.logger.info("Updating train context")
             self.context_data.train_status = TrainData(
                 train_status=await self.traincheck_service.check_train(),
                 last_updated=datetime.now(),
             )
 
+        self.logger.info("Updating shoppinglist context")
         self.context_data.shoppinglist = ShoppingList(
             shopping_list=await self.shopping_list_service.get_shoppinglist_items()
         )
@@ -128,10 +134,10 @@ class AiReportService:
         results = []
 
         if len(entries) > 0:
-            results.append("Calendar: " + reduce(lambda a, b: f"{a} - {b}", (event.format() for event in entries)))
+            results.append("Calendar entries: " + reduce(lambda a, b: f"{a} - {b}", (event.format() for event in entries)))
 
         if len(todos) > 0:
-            results.append("Todo: " + reduce(lambda a, b: f"{a} - {b}", (todo.format() for todo in todos)))
+            results.append("Todo list: " + reduce(lambda a, b: f"{a} - {b}", (todo.format() for todo in todos)))
 
         return " | ".join(results)
 
@@ -166,13 +172,25 @@ class AiReportService:
         skill_data = self.get_relevant_skill_data()
 
         self.logger.info(f"Generating text report for {skill_data}")
+        now_str = datetime.now().astimezone().strftime("%H:%M")
 
         response = self.client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o-2024-08-06",
             messages=[
-                {"role": "system",
-                 "content": "You assist like a caring girlfriend and answer like in a oral conversation but keep it short. Do not say you do not have anymore info and do not give advice. Answer in german. Do not say you are not trained for something. Mention the weather if it needs special clothing. Do not use emojis or formatting. Do not make up stuff."},
-                {"role": "user", "content": f"Gib mir eine Übersicht über folgende Informationen ohne etwas auszulassen: {skill_data}"},
+                {
+                    "role": "system",
+                    "content":
+                        f"You assist like a warm, caring, girlfriend. Answer in natural, fluent sentences as in an oral"
+                        f" conversation but keep it short. "
+                        f"Do not say you do not have anymore info and do not give too much advice. Answer in german. "
+                        f"Do not say you are not trained for something. Mention if the weather needs special clothing. "
+                        f"Do not use emojis or formatting. Do not make up stuff and never ask questions. "
+                        f"The user is named {self.user_name}, always start with a greeting. The current time is {now_str}"
+                },
+                {
+                    "role": "user",
+                    "content": f"Gib mir eine Übersicht über folgende Informationen ohne etwas auszulassen: {skill_data}"
+                },
             ]
         )
 

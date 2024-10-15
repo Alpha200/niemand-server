@@ -67,6 +67,7 @@ class Container(containers.DeclarativeContainer):
         config.location.traccar_device_id,
         config.calendar.calendar_names,
         config.weather.default_place,
+        config.general.user_name,
         location_service,
         calendar_service,
         weather_service,

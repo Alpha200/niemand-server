@@ -66,6 +66,7 @@ container.config.location.traccar_device_id.from_env('TRACCAR_DEVICE_ID', None)
 container.config.shopping.kitchenowl_url.from_env('KITCHENOWL_URL', None)
 container.config.shopping.kitchenowl_access_token.from_env('KITCHENOWL_TOKEN', None)
 container.config.shopping.shoppinglist_id.from_env('SHOPPINGLIST_ID', None)
+container.config.general.user_name.from_env('USER_NAME', None)
 
 RASA_BASE_URI = os.environ.get('RASA_BASE_URI', 'http://localhost:5005')
 AZURE_SPEECH_ACCESS_TOKEN = os.environ.get('AZURE_SPEECH_ACCESS_TOKEN', None)

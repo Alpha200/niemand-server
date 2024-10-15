@@ -26,7 +26,7 @@ class CalendarEntry:
                 start_text = f"Vom {format_date(self.begin)}"
                 end_text = f"Bis {format_date(self.end)}"
 
-        return f"Titel {self.summary} {start_text} {end_text}"
+        return f"'{self.summary}' {start_text} {end_text}"
 
 @dataclass
 class TodoEntry:
