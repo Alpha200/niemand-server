@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import reduce
-from typing import Optional, List
+from typing import List
 
 from openai import OpenAI
 
@@ -34,11 +34,11 @@ class ShoppingList:
 
 @dataclass
 class ContextData:
-    location: Optional[DeviceLocation]
-    calender: Optional[Calendar]
-    weather: Optional[Weather]
-    train_status: Optional[TrainData]
-    shoppinglist: Optional[ShoppingList]
+    location: DeviceLocation | None
+    calender: Calendar | None
+    weather: Weather | None
+    train_status: TrainData | None
+    shoppinglist: ShoppingList | None
 
 
 class AiReportService:
@@ -77,6 +77,7 @@ class AiReportService:
 
     async def update_context(self):
         self.logger.info(f"Start updating user context")
+        self.logger.info(f"Updating location context")
         self.context_data.location = await self.location_service.get_device_location(self.traccar_device_id)
 
         self.logger.info(f"Updating calendar context")
@@ -147,17 +148,24 @@ class AiReportService:
 
         return self.context_data.weather.forecast
 
-    def get_train_data(self):
-        if self.context_data.train_status is None:
+    def get_train_data(self) -> str:
+        if self.context_data.train_status is None or self.context_data.location.geofence_category != 'home':
             return ""
 
         return self.context_data.train_status.train_status
 
-    def get_shopping_data(self):
-        if self.context_data.shoppinglist is None:
+    def get_shopping_data(self) -> str:
+        if (
+                self.context_data.shoppinglist is None
+                or self.context_data.location is None
+                or self.context_data.location.geofence_category != 'grocery-shopping'
+        ):
             return ""
 
-        return "Shopping list: " + ", ".join([item.name for item in self.context_data.shoppinglist.shopping_list])
+        if len(self.context_data.shoppinglist.shopping_list) > 0:
+            return "Shopping list: " + ", ".join([item.name for item in self.context_data.shoppinglist.shopping_list])
+        else:
+            return "Nothing on shopping list"
 
     def get_relevant_skill_data(self) -> str:
         data = [

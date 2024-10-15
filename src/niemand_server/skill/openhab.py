@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, List, Tuple
+from typing import List, Tuple
 
 from genderdeterminator import GenderDeterminator, Case
 
@@ -26,7 +26,7 @@ class OpenHABSkill(NiemandSkill):
         word = "im" if word == "dem" else "in der"
         return f"{word} {noun}"
 
-    def get_items_and_room(self, context: ProcessResponseContext) -> Tuple[Optional[List[str]], Optional[str]]:
+    def get_items_and_room(self, context: ProcessResponseContext) -> Tuple[List[str] | None, str | None]:
         room_entity = get_entity_by_name(context.nlu.entities, 'room')
         device_entities = [entity.value for entity in get_entities_by_name(context.nlu.entities, 'device')]
 
@@ -113,7 +113,7 @@ class OpenHABSkill(NiemandSkill):
 
         return True, result_sentence
 
-    async def handle_nlu_result(self, result: ProcessResponseContext) -> Optional[SkillResult]:
+    async def handle_nlu_result(self, result: ProcessResponseContext) -> SkillResult | None:
         if not self.intent_has_global_min_confidence(result.nlu.intent):
             return None
 

@@ -1,7 +1,7 @@
 import logging
 import os
 from itertools import chain
-from typing import Optional, List, Dict
+from typing import List, Dict
 
 import aiohttp
 
@@ -61,7 +61,7 @@ class Item:
 
 
 class OpenhabService:
-    def __init__(self, openhab_server_url: str, auth_token: Optional[str], lang: str):
+    def __init__(self, openhab_server_url: str, auth_token: str | None, lang: str):
         self.logger = logging.getLogger(__name__)
         self.openhab_server_url = openhab_server_url
         self.lang = lang

@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -15,7 +14,7 @@ class WeatherService:
 
         return BeautifulSoup(html_doc, 'html.parser')
 
-    async def get_forecast(self, place: str, date: Optional[datetime] = None) -> Optional[str]:
+    async def get_forecast(self, place: str, date: datetime | None = None) -> str | None:
         soup = await self.download_weather(place)
 
         forecast_texts = soup.find_all("div", class_="report-text")

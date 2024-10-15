@@ -1,5 +1,3 @@
-from typing import Optional
-
 from .skill import NiemandSkill, SkillResult, ProcessResponseContext
 from ..service.traincheck import TrainCheckService
 
@@ -11,7 +9,7 @@ class TraincheckSkill(NiemandSkill):
     async def init(self):
         pass
 
-    async def handle_nlu_result(self, result: ProcessResponseContext) -> Optional[SkillResult]:
+    async def handle_nlu_result(self, result: ProcessResponseContext) -> SkillResult | None:
         if not self.intent_has_global_min_confidence(result.nlu.intent):
             return None
 

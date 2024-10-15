@@ -1,6 +1,3 @@
-import os
-from typing import Optional
-
 from openai import OpenAI
 from .skill import NiemandSkill, SkillResult, ProcessResponseContext
 
@@ -11,7 +8,7 @@ class ChatGptSkill(NiemandSkill):
     def __init__(self, openai_api_key: str):
         self.client = OpenAI(api_key=openai_api_key)
 
-    async def handle_nlu_result(self, result: ProcessResponseContext) -> Optional[SkillResult]:
+    async def handle_nlu_result(self, result: ProcessResponseContext) -> SkillResult | None:
         response = self.client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[

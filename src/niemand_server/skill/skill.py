@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import List
 
 from pydantic import BaseModel
 
@@ -17,7 +17,7 @@ class NluProcessResponseIntent(BaseModel):
 
 class NluProcessEntity(BaseModel):
     entity: str
-    confidence: Optional[float]
+    confidence: float | None
     value: str | float | int
     extractor: str
 
@@ -30,7 +30,7 @@ class NluProcessResponseContext(BaseModel):
 class ProcessResponseContext(BaseModel):
     nlu: NluProcessResponseContext
     utterance: str
-    site: Optional[str]
+    site: str | None
 
 
 class ProcessResponse(BaseModel):
@@ -60,7 +60,7 @@ def map_context(result_json: dict, utterance: str, site: str) -> ProcessResponse
     )
 
 
-def get_entity_by_name(entities: List[NluProcessEntity], name: str) -> Optional[NluProcessEntity]:
+def get_entity_by_name(entities: List[NluProcessEntity], name: str) -> NluProcessEntity | None:
     return next((entity for entity in entities if entity.entity == name), None)
 
 
@@ -73,5 +73,5 @@ class NiemandSkill(ABC):
         return intent.confidence > 0.85
 
     @abstractmethod
-    async def handle_nlu_result(self, result: ProcessResponseContext) -> Optional[SkillResult]:
+    async def handle_nlu_result(self, result: ProcessResponseContext) -> SkillResult | None:
         pass

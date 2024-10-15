@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import timedelta, datetime, date
-from typing import List, Optional, Union, Tuple
+from typing import List, Tuple
 
 import caldav
 from icalendar import Calendar, Event
@@ -11,8 +11,8 @@ from niemand_server.util import format_date
 @dataclass
 class CalendarEntry:
     summary: str
-    begin: Union[datetime, date]
-    end: Optional[Union[datetime, date]]
+    begin: datetime | date
+    end: datetime | date | None
 
     def format(self) -> str:
         if isinstance(self.begin, datetime):
@@ -31,9 +31,9 @@ class CalendarEntry:
 @dataclass
 class TodoEntry:
     summary: str
-    begin: Optional[Union[datetime, date]]
-    due: Optional[Union[datetime, date]]
-    priority: Optional[int]
+    begin: datetime | date | None
+    due: datetime | date | None
+    priority: int | None
     geo: Tuple[float, float]
 
     def format(self) -> str:

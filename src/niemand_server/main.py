@@ -2,7 +2,7 @@ import logging
 import os
 import time
 from contextlib import asynccontextmanager
-from typing import Optional, Annotated
+from typing import Annotated
 
 import aiohttp
 import uvicorn
@@ -149,7 +149,7 @@ async def azure_stt(websocket: WebSocket):
     # Instantiate the speech recognizer with push stream input
     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
 
-    result: Optional[str] = None
+    result: str | None = None
     stopped = False
 
     def recognized_cb(evt):

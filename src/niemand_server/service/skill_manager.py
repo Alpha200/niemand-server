@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 from ..skill.skill import NiemandSkill, SkillResult, ProcessResponseContext
 from ..skill.openhab import OpenHABSkill
 from ..skill.traincheck import TraincheckSkill
@@ -27,7 +27,7 @@ class SkillManagerService:
             chatgpt_skill,
         ]
 
-    async def run_skills(self, nlu_result: ProcessResponseContext) -> Optional[SkillResult]:
+    async def run_skills(self, nlu_result: ProcessResponseContext) -> SkillResult | None:
         for skill in self.skills:
             result = await skill.handle_nlu_result(nlu_result)
 

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from .skill import NiemandSkill, ProcessResponseContext, SkillResult, get_entity_by_name
 from ..service.weather import WeatherService
 
@@ -12,7 +10,7 @@ class WeatherSkill(NiemandSkill):
     async def init(self):
         pass
 
-    async def handle_nlu_result(self, result: ProcessResponseContext) -> Optional[SkillResult]:
+    async def handle_nlu_result(self, result: ProcessResponseContext) -> SkillResult | None:
         if not self.intent_has_global_min_confidence(result.nlu.intent):
             return None
 

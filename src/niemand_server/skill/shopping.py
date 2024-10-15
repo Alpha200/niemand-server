@@ -1,6 +1,4 @@
 import os
-from typing import Optional
-
 from .skill import NiemandSkill, SkillResult, ProcessResponseContext, get_entity_by_name
 from ..service.shopping import ShoppingListService
 
@@ -15,7 +13,7 @@ class ShoppingSkill(NiemandSkill):
     async def init(self):
         pass
 
-    async def handle_nlu_result(self, result: ProcessResponseContext) -> Optional[SkillResult]:
+    async def handle_nlu_result(self, result: ProcessResponseContext) -> SkillResult | None:
         if not self.intent_has_global_min_confidence(result.nlu.intent):
             return None
 
