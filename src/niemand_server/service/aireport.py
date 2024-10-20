@@ -45,6 +45,7 @@ class ContextData:
 class StructuredReport:
     train_stations: List[Station]
     trains: List[Trip]
+    shopping_list: List[ShoppinglistItem]
 
 class AiReportService:
     def __init__(
@@ -241,4 +242,5 @@ class AiReportService:
         return StructuredReport(
             trains=trains,
             train_stations=train_stations,
+            shopping_list=self.context_data.shoppinglist.shopping_list,
         )
