@@ -3,6 +3,7 @@ from .service.calendar import CalendarService
 from .service.location import LocationService
 from .service.openhab import OpenhabService
 from .service.shopping import ShoppingListService
+from .service.train import TrainService
 from .service.traincheck import TrainCheckService
 from .service.weather import WeatherService
 from .service.skill_manager import SkillManagerService
@@ -61,6 +62,11 @@ class Container(containers.DeclarativeContainer):
         config.shopping.shoppinglist_id,
     )
 
+    train_service = providers.Singleton(
+        TrainService,
+        config.train.db_rest_api_url,
+    )
+
     aireport_service = providers.Singleton(
         AiReportService,
         config.openai.openai_api_key,
@@ -73,6 +79,7 @@ class Container(containers.DeclarativeContainer):
         weather_service,
         traincheck_service,
         shoppinglist_service,
+        train_service,
     )
 
     # Skills

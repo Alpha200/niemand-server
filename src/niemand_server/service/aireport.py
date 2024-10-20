@@ -9,6 +9,7 @@ from openai import OpenAI
 from niemand_server.service.calendar import CalendarEntry, TodoEntry, CalendarService
 from niemand_server.service.location import LocationService, DeviceLocation
 from niemand_server.service.shopping import ShoppinglistItem, ShoppingListService
+from niemand_server.service.train import TrainService, Station, Trip
 from niemand_server.service.traincheck import TrainCheckService
 from niemand_server.service.weather import WeatherService
 
@@ -40,6 +41,10 @@ class ContextData:
     train_status: TrainData | None
     shoppinglist: ShoppingList | None
 
+@dataclass
+class StructuredReport:
+    train_stations: List[Station]
+    trains: List[Trip]
 
 class AiReportService:
     def __init__(
@@ -54,6 +59,7 @@ class AiReportService:
             weather_service: WeatherService,
             traincheck_service: TrainCheckService,
             shopping_list_service: ShoppingListService,
+            train_service: TrainService,
     ):
         self.client = OpenAI(api_key=openai_api_key)
         self.traccar_device_id = traccar_device_id
@@ -65,6 +71,7 @@ class AiReportService:
         self.weather_service = weather_service
         self.traincheck_service = traincheck_service
         self.shopping_list_service = shopping_list_service
+        self.train_service = train_service
         self.logger = logging.getLogger(__name__)
 
         self.context_data = ContextData(
@@ -218,3 +225,20 @@ class AiReportService:
         ) as response:
             for chunk in response.iter_bytes():
                 yield chunk
+
+    async def generate_structured_report(self, parsed_location):
+        if not parsed_location:
+            return
+        else:
+            location = parsed_location
+
+        trains = None
+        train_stations = await self.train_service.get_stations(location)
+
+        if len(train_stations) > 0:
+            trains = await self.train_service.get_departures(train_stations[0].id)
+
+        return StructuredReport(
+            trains=trains,
+            train_stations=train_stations,
+        )

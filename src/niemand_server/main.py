@@ -67,6 +67,7 @@ container.config.shopping.kitchenowl_url.from_env('KITCHENOWL_URL', None)
 container.config.shopping.kitchenowl_access_token.from_env('KITCHENOWL_TOKEN', None)
 container.config.shopping.shoppinglist_id.from_env('SHOPPINGLIST_ID', None)
 container.config.general.user_name.from_env('USER_NAME', None)
+container.config.train.db_rest_api_url.from_env('DB_REST_API_URL', 'https://v6.db.transport.rest')
 
 RASA_BASE_URI = os.environ.get('RASA_BASE_URI', 'http://localhost:5005')
 AZURE_SPEECH_ACCESS_TOKEN = os.environ.get('AZURE_SPEECH_ACCESS_TOKEN', None)
@@ -113,6 +114,19 @@ async def generate_text_report(aireport: AiReportService = Depends(Provide[Conta
 async def generate_voice_report(aireport: AiReportService = Depends(Provide[Container.aireport_service])) -> StreamingResponse:
     return StreamingResponse(aireport.generate_voice_report(), media_type="audio/mpeg")
 
+@app.get("/assistant/report/structured")
+@inject
+async def generate_voice_report(
+        location: str,
+        aireport: AiReportService = Depends(Provide[Container.aireport_service])
+) -> StreamingResponse:
+    parsed_location = None
+
+    if location is not None:
+        location_split = location.split(',')
+        parsed_location = float(location_split[0]), float(location_split[1])
+
+    return await aireport.generate_structured_report(parsed_location)
 
 @app.post("/assistant/azure-tts")
 async def azure_tts(message: TTSMessage):
