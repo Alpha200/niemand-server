@@ -46,7 +46,7 @@ class TrainService:
 
     async def get_departures(self, station_id: str):
         async with aiohttp.ClientSession() as session:
-            result = await session.get(url=f'{self.db_rest_url}/stops/{station_id}/departures')
+            result = await session.get(url=f'{self.db_rest_url}/stops/{station_id}/departures?duration=30')
             result.raise_for_status()
             items = (await result.json())['departures']
             return [
